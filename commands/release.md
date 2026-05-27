@@ -1,0 +1,73 @@
+---
+description: Use when about to ship a release — packaging a Chrome extension, publishing an npm package, cutting a GitHub release, tagging a version, bumping package.json/manifest.json, running a publish/deploy/upload step. Triggers on "release", "publish", "ship it", "tag", "version bump", "package the extension", "cut a release". Runs the pre-release checklist (version bump → changelog → secrets scan → gitignore audit → CI green → dry-run build) and stops before push/publish for user confirmation.
+---
+
+You are running a **release / publish checklist** in the current repo. The goal: catch the recurring frictions (forgotten version bumps, missed gitignore staging, near-miss secret leaks) before they hit a public release. **Do not push, tag, package, or publish without explicit user confirmation at the end.**
+
+## Inputs
+
+Determine the release type from context:
+- Chrome extension? → `manifest.json` version
+- npm package? → `package.json` version (and `package-lock.json`)
+- .NET app? → `Directory.Build.props` / `.csproj` `<Version>` / `AssemblyVersion`
+- Plain GitHub release? → tag + GitHub release notes
+
+If unclear, ask the user which release type before running.
+
+## Checklist
+
+Run all of these. Report findings as a single structured summary at the end.
+
+### 1. Version bump
+
+- Read the current version. Ask the user what the new version should be (semver: patch / minor / major). Bump exactly that file (or set of files for monorepos / multi-target apps).
+- For npm: also run `npm install` so `package-lock.json` updates, then verify nothing else changed unexpectedly.
+- Stage the version-bump as part of the release commit.
+
+### 2. Changelog / release notes
+
+- If a `CHANGELOG.md` exists: append a new section for this version with a summary derived from `git log <last-tag>..HEAD --oneline`.
+- If GitHub release notes are used instead, draft them but do not publish — just hand them to the user.
+
+### 3. Secrets scan (mandatory)
+
+- Grep working tree and recent commits for: emails, internal hostnames, salary numbers, hardcoded paths (`C:\`, `/home/`), `*.pem` / `*.key` files, `.env*`.
+- If anything found in *committed history*: stop. Recommend a history rewrite (`git filter-repo`); do **not** propose a cleanup commit on top.
+
+### 4. `.gitignore` audit
+
+- Confirm build artifacts (`dist/`, `build/`, `target/`, `bin/`, `obj/`), env files, OS files, IDE folders are ignored.
+- Check `git ls-files` for anything currently tracked that *should* be ignored.
+
+### 5. CI green check
+
+- `gh run list --limit 5` and confirm the latest run on the head commit is green.
+- If CI is red or stale: stop. Report which check is failing.
+
+### 6. Build / package (dry run)
+
+- Run the build/package command (`npm run build`, `dotnet publish`, etc.).
+- Confirm it produces the expected artifact at the expected path.
+- Do not upload, do not publish — only verify the artifact exists and is roughly the expected size.
+
+## On findings
+
+For any finding that should block the release, **stop immediately** and report. The user can override, but the stop is the default.
+
+For non-blocking findings (changelog spelling, missing minor `.gitignore` entries), include them in the summary but proceed.
+
+## Final summary
+
+End with:
+- Version: `old → new`
+- Files staged (list)
+- Changelog entry (if any)
+- CI status
+- Artifact path + size
+- **Next action for the user:** the exact commit + tag + push commands to run, or the package upload command. **Don't run them.**
+
+## Boundaries
+
+- Never `git push`, `npm publish`, `gh release create`, `dotnet nuget push`, or equivalent without the user typing "go" or equivalent.
+- Never flip a private repo public.
+- Never force-push.

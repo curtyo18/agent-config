@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Dispatcher: runs the secret-scan layer + any future pre-commit checks.
+set -e
+"$HOME/.claude/hooks/pre-commit-secret-scan.sh"

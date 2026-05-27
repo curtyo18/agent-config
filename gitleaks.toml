@@ -1,0 +1,19 @@
+# gitleaks.toml — extends default gitleaks rules with project-specific patterns.
+# See https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml for the bundled defaults.
+
+title = "agent-config gitleaks rules"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "anthropic-api-key"
+description = "Anthropic API key (sk-ant-…)"
+regex = '''sk-ant-[a-zA-Z0-9_\-]{40,}'''
+tags = ["key", "anthropic"]
+
+[[rules]]
+id = "ntfy-token"
+description = "ntfy.sh bearer token in env-like assignment"
+regex = '''(?i)NTFY_TOKEN\s*=\s*['"]?tk_[a-zA-Z0-9_\-]{20,}'''
+tags = ["key", "ntfy"]

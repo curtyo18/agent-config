@@ -1,0 +1,9 @@
+# Default: auto-detect text/binary, force LF in working tree on all platforms.
+# Required because this repo is edited from Windows but hooks and scripts run
+# in the Linux container, where CRLF breaks shebangs and `set -e`.
+* text=auto eol=lf
+
+# Windows-native scripts keep CRLF
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf

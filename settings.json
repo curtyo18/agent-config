@@ -1,0 +1,35 @@
+{
+  "model": "opus",
+  "statusLine": {
+    "type": "command",
+    "command": "python3 $HOME/.claude/statusline.py"
+  },
+  "hooks": {},
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true
+  },
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": [
+      "Bash(npm run typecheck)",
+      "Bash(npm run typecheck *)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint *)",
+      "Bash(npm audit)",
+      "Bash(npm audit *)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npx tsc --noEmit *)",
+      "Bash(npx tsc -b)",
+      "Bash(npx tsc -b *)",
+      "Bash(npx vitest run)",
+      "Bash(npx vitest run *)",
+      "Bash(git fetch)",
+      "Bash(git fetch *)",
+      "Bash(npm run build)",
+      "Bash(npm run build *)",
+      "Bash(gh issue *)"
+    ]
+  },
+  "effortLevel": "high",
+  "skipDangerousModePermissionPrompt": true
+}
