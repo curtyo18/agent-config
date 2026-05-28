@@ -7,7 +7,7 @@ You are running a **release / publish checklist** in the current repo. The goal:
 ## Inputs
 
 Determine the release type from context:
-- Chrome extension? → `manifest.json` version
+- Chrome extension? → `package.json` version for WXT / generated-manifest projects (WXT stamps it into `manifest.json` at build); `manifest.json` directly for a hand-rolled extension
 - npm package? → `package.json` version (and `package-lock.json`)
 - .NET app? → `Directory.Build.props` / `.csproj` `<Version>` / `AssemblyVersion`
 - Plain GitHub release? → tag + GitHub release notes
@@ -46,7 +46,7 @@ Run all of these. Report findings as a single structured summary at the end.
 
 ### 6. Build / package (dry run)
 
-- Run the build/package command (`npm run build`, `dotnet publish`, etc.).
+- Run the build/package command (`npm run build`, `wxt zip` / `npm run zip` for a WXT extension, `dotnet publish`, etc.).
 - Confirm it produces the expected artifact at the expected path.
 - Do not upload, do not publish — only verify the artifact exists and is roughly the expected size.
 
