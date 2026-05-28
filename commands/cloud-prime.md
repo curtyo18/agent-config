@@ -6,7 +6,7 @@ You are producing a **cloud-agent prime** in the established `Brief:` format. Th
 
 ## Hard rules
 
-1. **No absolute paths.** Never reference `E:\projects\<repo>`, `E:\my-project`, `C:\Users\...`, or any other local-machine path. The agent has no idea where the repo lives in the sandbox. All paths must be repo-relative (`packages/engine/src/scan/walker.ts`).
+1. **No absolute paths.** Never reference a local-machine path — `/home/<user>/projects/<repo>`, `/workspace/<repo>`, a Windows drive path like `C:\Users\...`, or anything else tied to your machine. The agent has no idea where the repo lives in its sandbox. All paths must be repo-relative (`packages/engine/src/scan/walker.ts`).
 2. **No local-only verification steps.** Things that need a local test drive, local devices, or the user's actual environment can't go in "verification before declaring done" — they belong in a separate **Local review steps** section that the user runs after the agent reports back.
 3. **Self-contained.** The agent has no chat history, no scrollback, no memory of prior conversations. Anything it needs to know — file paths, schema shapes, naming conventions, gotchas, ESLint rules already in place — must be in the brief itself or be discoverable via `gh issue view`, `git log`, or reading the repo.
 4. **No commit-history breadcrumbs about meta-tooling, the cloud-vs-local handoff, or implementation scaffolding.** Commits and PR bodies should read as if a human wrote them.
@@ -22,8 +22,13 @@ You are producing a **cloud-agent prime** in the established `Brief:` format. Th
 ## First thing this session
 
 ```
-git config user.email you@example.com && git config user.name "Your Name"
+git config user.email "<operator-email>" && git config user.name "<operator-name>"
 ```
+
+<Authoring note — do NOT leave the angle-bracket placeholders in the emitted brief. At generation time, read the operator's real local identity and substitute it:
+  git config user.email
+  git config user.name
+Inject those literal values into the line above so the cloud agent commits under the correct identity. If either is unset, leave the explicit placeholder `<operator-email>` / `<operator-name>` in place so the operator notices and fills it in before dispatching — never invent or hardcode an address.>
 
 <Brief 1-2 sentences on branch policy: work on a feature branch the agent creates (cloud agents default to `claude/<slug>-XXXXX` — that's fine), one commit per task in order, push the branch and open a PR back to `main` when done. Closing keywords on commits will auto-close issues when the PR is merged (the user merges, not the agent).>
 
@@ -85,7 +90,7 @@ Go.
 
 ## Common mistakes (from past handoffs)
 
-- Putting `E:\my-project` in verification → agent has no E: drive.
+- Putting a local absolute path (e.g. `/home/<user>/projects/<repo>`) in verification → the agent's sandbox has no such path.
 - Saying "the user's local repo" → repo IS the agent's working directory.
 - Telling the agent to "push directly to main" → cloud agents push to a sandbox feature branch by default and ignore main-only directives. Honor the natural flow: feature branch + PR.
 - Forgetting `git config user.email / user.name` → commits land with the wrong author.
@@ -96,13 +101,13 @@ Go.
 
 Save the brief to `~/.claude/plans/<YYYY-MM-DD>-<slug>-cloud-prime.md` and print it in a fenced markdown code block in your response so the user can copy from chat. End your response with the file path so they know where it lives.
 
-After printing the brief, ask the user: "Want me to copy it to the clipboard?" If they say yes, copy via the PowerShell tool: `Get-Content <absolute-path> -Raw | Set-Clipboard` (prefer PowerShell if available, fall back to Bash `clip`). Fall back to `clip < <path>` via Bash if PowerShell isn't available. Confirm once it's copied. If they decline, leave it.
+The saved file is the primary handoff artifact — the user can open it, copy from it, or attach it directly. After printing the brief, offer to copy it to the clipboard if a clipboard utility is available in the environment (e.g. `xclip`/`xsel`/`wl-copy` on Linux, `pbcopy` on macOS, or whatever bridge the harness exposes). If none is available, point the user at the saved file path — that's sufficient. Don't assume any particular OS or shell. If they decline, leave it.
 
 **Do not** dispatch the brief — that's the user's step. **Do not** start implementing — this skill produces the prime, nothing else.
 
 ## Post-receipt audit (receive mode)
 
-Cloud agents consistently slip AI-attribution trailers into PR bodies despite the brief's explicit non-goal. **Observed twice in one project** (your-org/your-repo PR #1 and PR #6); both times the agent's self-report claimed "no AI-attribution markers" and both times the audit found them in the PR body. **Do not trust the agent's self-report.** The non-goal in the produced brief is advisory at best — treat audit as enforcement.
+Cloud agents consistently slip AI-attribution trailers into PR bodies despite the brief's explicit non-goal. This recurs even when the agent's own self-report claims "no AI-attribution markers" — the markers are there in the PR body anyway. **Do not trust the agent's self-report.** The non-goal in the produced brief is advisory at best — treat the audit as enforcement.
 
 When the user pastes a cloud-agent report (commit hash table, "PR opened at #N", "summary below", "Closes #N", "done"), **before** suggesting merge:
 
@@ -117,13 +122,12 @@ When the user pastes a cloud-agent report (commit hash table, "PR opened at #N",
 3. **Fetch source diff** for any non-trivial changes (in case markers slipped into code, comments, or generated docs):
 
    ```
-   # for each file from step 2, fetch the branch's head version
-   $sha = (gh pr view <num> --repo <owner>/<repo> --json headRefOid --jq .headRefOid)
-   # then per file:
-   curl -sSL "https://raw.githubusercontent.com/<owner>/<repo>/<sha>/<path>"
+   # resolve the branch head SHA, then fetch each file at that revision
+   sha=$(gh pr view <num> --repo <owner>/<repo> --json headRefOid --jq .headRefOid)
+   gh api "repos/<owner>/<repo>/contents/<path>?ref=$sha" --jq '.content' | base64 -d
    ```
 
-   Or just iterate via PowerShell `Invoke-WebRequest` / similar.
+   `gh api` keeps it authenticated and avoids reaching for a raw HTTP client; iterate over the file list from step 2.
 
 4. **Scan patterns (case-insensitive):**
    - `claude\.ai/code`
