@@ -130,5 +130,4 @@ When the subagent returns, surface its report inline. Do not summarise it away. 
 ## Notes for the operator (you)
 
 - This command does not write files, push, or merge. It only reports.
-- If the reviewer is wrong, push back with technical reasoning — same as `superpowers:requesting-code-review`.
-- For lighter generic reviews, `superpowers:requesting-code-review` continues to work and is unaffected by this command.
+- If the reviewer is wrong, push back with technical reasoning rather than implementing blindly.

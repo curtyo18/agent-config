@@ -5,9 +5,7 @@
     "command": "python3 $HOME/.claude/statusline.py"
   },
   "hooks": {},
-  "enabledPlugins": {
-    "superpowers@claude-plugins-official": true
-  },
+  "enabledPlugins": {},
   "permissions": {
     "defaultMode": "bypassPermissions",
     "allow": [
