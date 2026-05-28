@@ -71,7 +71,6 @@ dist/
 
 ## Key Preferences
 
-- No auto-commits, no auto-push — always ask before git operations
 - Concise code — don't add comments, docstrings, or error handling for impossible scenarios
 - Don't over-engineer — build exactly what's needed, no speculative abstractions
 - Rebuild and verify after every change — always run `npm run build` and confirm it's clean before finishing
