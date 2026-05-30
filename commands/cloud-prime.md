@@ -32,6 +32,14 @@ Inject those literal values into the line above so the cloud agent commits under
 
 <Brief 1-2 sentences on branch policy: work on a feature branch the agent creates (cloud agents default to `claude/<slug>-XXXXX` — that's fine), one commit per task in order, push the branch and open a PR back to the default branch when done. Closing keywords on commits will auto-close issues when the PR is merged (the user merges, not the agent).>
 
+## Environment & commands
+
+- **Install:** `<exact install command — e.g. pnpm install>` (run first; the sandbox may start clean)
+- **Run tests:** `<exact command — e.g. pnpm test>` · single file: `<e.g. pnpm vitest run <path>>`
+- **Build:** `<exact command, or "n/a">` · **Lint/format:** `<exact command — must pass before each commit>`
+- **Runtime / toolchain:** `<e.g. Node 20, TypeScript 5.x>`
+- **Layout:** `<e.g. pnpm workspaces; run commands from repo root>` (omit if single-package)
+
 ## Tasks
 
 ### T01 — <imperative verb + scope>
@@ -44,7 +52,9 @@ Inject those literal values into the line above so the cloud agent commits under
 - <bullet>
 
 **Test:**
-- <vitest / jest / etc. test sketch>
+- <what to assert> — run with `<exact command, e.g. pnpm vitest run <path>>`
+
+**Done when:** <one-line behavioural acceptance — what observably works, not "PR opened">
 
 **Commit:** `<conventional-commit subject>`
 
@@ -64,12 +74,15 @@ Inject those literal values into the line above so the cloud agent commits under
 - Do not <X>.
 - Do not <Y>.
 
+**Do not modify:** `<path>`, `<path>` — generated manifests, lockfiles, unrelated packages: the files the agent must leave untouched.
+
 ## Verification before declaring done
 
-1. All <N> commits present on the feature branch, pushed to origin.
-2. PR opened against the default branch from that branch (the agent opens it; the user merges).
-3. `gh run list --limit 3` shows the latest CI run on the branch tip is **green** (if the repo has CI).
-4. Issue #<n> will close automatically by the closing keyword in the matching commit when the PR is merged — confirm the keyword is in the commit subject.
+1. Every task's **Done when** is demonstrably met — run the commands in **Environment & commands** (tests, build, lint) and confirm they pass. Don't report "done" against code you didn't run.
+2. All <N> commits present on the feature branch, pushed to origin.
+3. PR opened against the default branch from that branch (the agent opens it; the user merges).
+4. `gh run list --limit 3` shows the latest CI run on the branch tip is **green** (if the repo has CI; if it has none, the step-1 commands ARE the gate).
+5. Issue #<n> will close automatically by the closing keyword in the matching commit when the PR is merged — confirm the keyword is in the commit subject.
 
 ## Reporting back
 
@@ -82,11 +95,14 @@ Go.
 
 - **Opening paragraph.** State the project version / phase if relevant ("v0.1.0, post-beta"), the immediate problem, and the connecting tissue between tasks. Don't summarize the task list — the task list speaks for itself.
 - **Tasks.** Each task is independent enough to land as its own commit. Order matters when later tasks depend on earlier scaffolding (migrations before repos before usage). Use `T01`, `T02`, … numbering.
+- **Environment & commands.** Derive these from the repo at generation time — `package.json` scripts, the lockfile name (pnpm/npm/yarn/bun), the CI workflow, the README. Emit the *exact* commands; the sandbox agent runs them verbatim. If you genuinely can't determine the test or build command, say so explicitly ("test command unknown — confirm before relying on CI") rather than guessing — a wrong command is worse than a flagged gap.
 - **Files.** List the exact repo-relative file paths the agent will touch. If a new file is being created, say `(new)` after the path.
-- **Test.** Sketch the test, don't write it. The agent fills in the details. Specify what should be asserted, not how.
+- **Test.** Sketch what to assert, not the test body — but always give the *exact command* to run it. The agent should never have to guess how to execute the suite.
+- **Done when.** A one-line behavioural acceptance per task — the observable outcome ("endpoint returns 200 with the new field", "list no longer re-renders on hover"). This, not "PR opened", is the bar the agent optimises to. Make it checkable.
+- **Do not modify.** List files the agent must leave alone — generated manifests, lockfiles, unrelated packages. A negative file list is the strongest concrete guard against scope creep; pair it with Non-goals.
 - **Commit subject.** Use the project's conventional-commit style (look at recent `git log --oneline` for the pattern: `feat(scope): …`, `fix(scope): …`, `perf+arch(scope): …`, `chore(scope): …`).
 - **Important context.** This is where existing schema constraints, lint rules, naming conventions, in-process state assumptions, and "things you'd otherwise miss" live. Reference exact file paths so the agent can read them directly.
-- **Non-goals.** Things the agent might be tempted to also fix or refactor while in there. Explicitly call them out so it doesn't expand scope.
+- **Non-goals.** Things the agent might be tempted to also fix or refactor while in there. Explicitly call them out so it doesn't expand scope. Keep one cloud handoff small — ideally 5–6 tasks or fewer; context-free agents degrade as task count grows, so split larger work into sequential briefs.
 
 ## Common mistakes (from past handoffs)
 
@@ -111,7 +127,9 @@ Cloud agents consistently slip AI-attribution trailers into PR bodies despite th
 
 When the user pastes a cloud-agent report (commit hash table, "PR opened at #N", "summary below", "Closes #N", "done"), **before** suggesting merge:
 
-1. **Identify the PR.** From the user's message, or via `gh pr list --repo <owner>/<repo> --state open --limit 3`. Pick the most recent PR matching the work described.
+1. **Identify the PR (or branch).** From the user's message, or via `gh pr list --repo <owner>/<repo> --state open --limit 3`. Pick the most recent PR matching the work described.
+   - **No PR?** Some flows push a branch without opening one. Audit the branch directly: `gh api "repos/<owner>/<repo>/commits?sha=<branch>" --jq '.[].commit.message'` for messages, and fetch changed files via the branch ref (step 3 with `ref=<branch>`).
+   - **Fork?** If the PR head is a fork (`gh pr view <num> --json headRepositoryOwner,headRepository`), branch contents live under the *fork's* owner/repo — use those in the `contents` call, not the base repo's, or it 404s.
 
 2. **Fetch PR body + commit metadata:**
 
@@ -129,19 +147,19 @@ When the user pastes a cloud-agent report (commit hash table, "PR opened at #N",
 
    `gh api` keeps it authenticated and avoids reaching for a raw HTTP client; iterate over the file list from step 2.
 
-4. **Scan patterns (case-insensitive):**
+4. **Scan patterns (case-insensitive). Run these over the PR body AND every commit message (subject + body) — a commit-body trailer survives a true merge commit even when the PR body is clean:**
    - `claude\.ai/code`
    - `Generated by\s*\[?Claude`
    - `Co-Authored-By:\s*Claude`
    - `🤖\s*Generated with`
    - `session_[a-zA-Z0-9]{16,}`
-   - `Anthropic\b` (in commit / PR-body context)
+   - `Anthropic\b` — **detect-only; never auto-scrub.** Flags legitimate mentions too (SDK use, changelogs, this very config). Surface any hit for the user to judge; don't rewrite on its account alone.
 
 5. **Remediation by location:**
 
    - **PR body** (the common case): rewrite via `gh pr edit <num> --body-file <clean.md>`. Write a clean version of the body to a temp markdown file (drop the trailing `---` separator + the `_Generated by [Claude Code](...)_` line, usually the last 2–3 lines), then apply. Verify with another `gh pr view --json body` afterwards.
 
-   - **Commit messages**: rewriting is destructive (changes hashes). Flag to the user; usually the right call is to either (a) accept and squash-merge so only the squash subject lands on the default branch, or (b) ask the cloud agent to amend and force-push the branch. Don't rewrite without explicit consent.
+   - **Commit messages**: first check the merge strategy (`gh repo view <owner>/<repo> --json squashMergeAllowed,mergeCommitAllowed`) — under squash-merge only the squash *subject* lands, so commit-body markers usually need no remediation; a true merge commit carries them through. Rewriting is destructive (changes hashes), so flag to the user; the right call is usually either (a) squash-merge so only the clean subject lands on the default branch, or (b) ask the cloud agent to amend and force-push the branch. Don't rewrite without explicit consent.
 
    - **Source files**: rare so far. Edit + commit a follow-up on the default branch after merge, or have the cloud agent fix on the branch before merge. Surface to user before suggesting merge.
 
