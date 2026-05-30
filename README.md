@@ -32,7 +32,7 @@ This config used to depend on the **superpowers** plugin for its planning and ex
 | `subagent-driven-development` / `executing-plans` | `skills/run-plan` — per-task subagent dispatch with two-stage review, or inline mode |
 | `brainstorming` | `skills/grill-me` + `idea` phases 1–2 |
 
-`grill-me` is a standalone adaptation of the relentless-interview idea: it drives the questioning in `idea`'s shaping and grilling phases, and can also be run on its own to stress-test any plan or design until the decision tree is resolved. `idea` is the front door (vague idea → spec → numbered plan → handoff menu); `run-plan` executes the resulting plan; `to-issues` converts it to GitHub issues instead. The three compose, but each also stands alone.
+`grill-me` is a standalone adaptation of the relentless-interview idea, originally inspired by Matt Pocock: it drives the questioning in `idea`'s shaping and grilling phases, and can also be run on its own to stress-test any plan or design until the decision tree is resolved. `idea` is the front door (vague idea → spec → numbered plan → handoff menu); `run-plan` executes the resulting plan; `to-issues` converts it to GitHub issues instead. The three compose, but each also stands alone.
 
 ## Adapting it
 
