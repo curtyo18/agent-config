@@ -9,6 +9,8 @@ You are running a **code-quality review** against the agent-config standards. Yo
 3. Inline all six rule files into a reviewer prompt.
 4. Dispatch a reviewer subagent (`Agent` tool, `general-purpose` type) and surface its report inline.
 
+> **Need a deeper pass?** This is the single-reviewer tier. For a thorough multi-agent audit — parallel domain reviewers + an independent cross-verification round before any fix — use `/deep-code-review`.
+
 ## Step 1 — Resolve the diff range
 
 Parse positional arguments:
