@@ -7,7 +7,7 @@ Claude Code configuration: coding standards, git hooks, slash commands, and skil
 - **standards/** — Code quality rules loaded by `/code-review`: naming, testing, duplication, module depth, dependency discipline, UI preferences.
 - **hooks/** — Pre-commit secret scanning (filename, regex, gitleaks).
 - **commands/** — Slash commands for code review, release checklists, cloud agent briefs, Chrome extension scaffolding, and pre-public-repo audits.
-- **skills/** — Agent skills: `idea` (vague → grilled spec → plan), `run-plan` (subagent execution), `to-issues`, `grill-me`.
+- **skills/** — Agent skills: `idea` (vague → grilled spec → plan), `run-plan` (subagent execution), `to-issues`, `grill-me`, `debug` (root-cause-first investigation).
 - **statusline.py** — Optional Claude Code status line script showing session usage metrics.
 - **gitleaks.toml** — Secret pattern rules for the pre-commit scan.
 - **network-allowlist.conf** — Squid ACL entries used by [agent-sandbox](https://github.com/curtyo18/agent-sandbox).
