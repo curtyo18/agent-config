@@ -4,7 +4,6 @@ Stay inside the boundary of what was asked.
 
 - Do **not** remove or alter existing UX behaviors (animations, dimming, hover states, pagination, keyboard shortcuts, default values) without explicit approval. If you think a behavior is wrong, *flag it* — don't quietly delete it.
 - Do **not** refactor adjacent code, rename unrelated variables, "clean up" comments, or reorder imports while doing an unrelated task. A bug fix doesn't need surrounding cleanup.
-- Do **not** widen searches beyond the project (no scanning the entire C: drive, no `find /` style traversal). Scope to the working directory unless the user explicitly asks for a broader search.
 
 If a change you want to make falls outside the request, say so and ask first.
 
@@ -20,20 +19,9 @@ This rule exists because patching a flawed model with offset hacks always loses 
 
 ## Git workflow defaults
 
-- **Main-only branching.** Don't propose feature-branch / develop-branch / release-branch workflows unless explicitly requested. Work on `main`; small focused commits.
 - **Single commit per logical change.** Stage all related files together (`.gitignore`, code, tests, docs, frontmatter) in one commit. Don't follow a feature commit with a "fix gitignore" or "fix lint" cleanup commit — amend or restage before pushing.
 - **History rewrite for secrets / proprietary refs.** If you discover a leak in past commits, rewrite history (`git filter-repo`, interactive rebase) — don't add a "remove secret" cleanup commit. Cleanup commits don't actually remove the secret from history.
 - **No `--force-push` to a shared branch** without explicit confirmation. To `main` on a public repo: never without confirmation.
-
-## Release / publish checklist
-
-Before packaging, tagging, or publishing (Chrome extension, npm package, public repo flip, GitHub release):
-
-1. **Version bump first.** Update `package.json`/`manifest.json`/equivalent before building.
-2. **Secrets scan.** Grep history for emails, internal hostnames, salary numbers, proprietary product names, hardcoded absolute paths.
-3. **`.gitignore` audit.** Confirm no built artifacts, `.env`, large binaries, or `docs/` build output are tracked.
-4. **CI green.** Verify test suite passes on the version you're shipping, not on a stale local run.
-5. **Stop before flipping public.** Report findings and confirm with user before pushing or making the repo public.
 
 ## Permission-prompt hygiene
 
@@ -45,6 +33,8 @@ Before asking the user to approve a Bash command (or after a tool call is denied
 4. **Only then ask.** If you still need the user, propose the *narrowest* form and explain why no safer alternative exists.
 
 Do not retry the same denied command verbatim. Treat a denial as a signal to rethink, not to repeat.
+
+> **Caveat — sandboxed / skip-permissions runs:** When Claude runs with `--dangerously-skip-permissions` (e.g. inside the agent-sandbox container), Bash commands never prompt — the container's guard rails (network allowlist, command wrappers, secret-scan hook) are the safety net instead. There, "it might get denied" no longer applies, so steps 2–4 are about *scope discipline and intent* (narrow, deliberate commands), not dodging a prompt.
 
 ## Self-heal on guard-rail hits
 
