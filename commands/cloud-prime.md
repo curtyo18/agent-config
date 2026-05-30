@@ -30,7 +30,7 @@ git config user.email "<operator-email>" && git config user.name "<operator-name
   git config user.name
 Inject those literal values into the line above so the cloud agent commits under the correct identity. If either is unset, leave the explicit placeholder `<operator-email>` / `<operator-name>` in place so the operator notices and fills it in before dispatching — never invent or hardcode an address.>
 
-<Brief 1-2 sentences on branch policy: work on a feature branch the agent creates (cloud agents default to `claude/<slug>-XXXXX` — that's fine), one commit per task in order, push the branch and open a PR back to `main` when done. Closing keywords on commits will auto-close issues when the PR is merged (the user merges, not the agent).>
+<Brief 1-2 sentences on branch policy: work on a feature branch the agent creates (cloud agents default to `claude/<slug>-XXXXX` — that's fine), one commit per task in order, push the branch and open a PR back to the default branch when done. Closing keywords on commits will auto-close issues when the PR is merged (the user merges, not the agent).>
 
 ## Tasks
 
@@ -67,7 +67,7 @@ Inject those literal values into the line above so the cloud agent commits under
 ## Verification before declaring done
 
 1. All <N> commits present on the feature branch, pushed to origin.
-2. PR opened against `main` from that branch (the agent opens it; the user merges).
+2. PR opened against the default branch from that branch (the agent opens it; the user merges).
 3. `gh run list --limit 3` shows the latest CI run on the branch tip is **green** (if the repo has CI).
 4. Issue #<n> will close automatically by the closing keyword in the matching commit when the PR is merged — confirm the keyword is in the commit subject.
 

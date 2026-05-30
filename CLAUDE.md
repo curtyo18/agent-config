@@ -21,7 +21,7 @@ This rule exists because patching a flawed model with offset hacks always loses 
 
 - **Single commit per logical change.** Stage all related files together (`.gitignore`, code, tests, docs, frontmatter) in one commit. Don't follow a feature commit with a "fix gitignore" or "fix lint" cleanup commit — amend or restage before pushing.
 - **History rewrite for secrets / proprietary refs.** If you discover a leak in past commits, rewrite history (`git filter-repo`, interactive rebase) — don't add a "remove secret" cleanup commit. Cleanup commits don't actually remove the secret from history.
-- **No `--force-push` to a shared branch** without explicit confirmation. To `main` on a public repo: never without confirmation.
+- **No `--force-push` to a shared branch** without explicit confirmation. To the default branch on a public repo: never without confirmation.
 
 ## Permission-prompt hygiene
 

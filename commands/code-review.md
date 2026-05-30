@@ -1,5 +1,5 @@
 ---
-description: Use to audit a diff against the agent-config code-quality standards before merge or push. Loads all standards/*.md rule files, then dispatches a reviewer subagent with the diff and the rules. Takes optional positional args `$1`=BASE_SHA `$2`=HEAD_SHA; defaults to origin/main and HEAD.
+description: Use to audit a diff against the agent-config code-quality standards before merge or push. Loads all standards/*.md rule files, then dispatches a reviewer subagent with the diff and the rules. Takes optional positional args `$1`=BASE_SHA `$2`=HEAD_SHA; defaults to the repo's default branch (`origin/HEAD`) and `HEAD`.
 ---
 
 You are running a **code-quality review** against the agent-config standards. Your job is to:
@@ -12,7 +12,7 @@ You are running a **code-quality review** against the agent-config standards. Yo
 ## Step 1 — Resolve the diff range
 
 Parse positional arguments:
-- `BASE` = `$1` if provided, otherwise `origin/main`.
+- `BASE` = `$1` if provided, otherwise the repo's default branch (`origin/HEAD` — resolves to `origin/main`, `origin/master`, etc.; if unset, run `git remote set-head origin -a` or pass `$1`).
 - `HEAD` = `$2` if provided, otherwise `HEAD`.
 
 Resolve to commit SHAs:
