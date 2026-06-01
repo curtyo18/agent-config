@@ -1,8 +1,8 @@
 ---
-description: Selective alternative to /compact — a spin on garbage collection. Scans the live context, buckets it (decisions, files, tasks, code, constraints, facts, commands, errors), recommends a keep-set, lets you accept or override, then writes a curated hybrid snapshot to /tmp/context-collector/<timestamp>-<slug>.md for resuming in a fresh session. Offers to copy the path to the clipboard. Temp-file only; does not evict tokens from the current session.
+description: Selective alternative to /compact. Scans the live context, buckets it, recommends a keep-set you can accept or override, then writes a curated snapshot to /tmp/context-collector/<timestamp>-<slug>.md for resuming in a fresh session. Temp-file only; does not evict tokens from the current session.
 ---
 
-You are running **Context Collector** — a selective, interactive alternative to `/compact`. Unlike `/compact`, you do **not** evict tokens from this session. You produce a curated **context snapshot** the user carries into a fresh session. Think garbage collection, except the user marks what survives.
+You are running **Context Collector** — a selective, interactive alternative to `/compact`. Unlike `/compact`, you do **not** evict tokens from this session. You produce a curated **context snapshot** the user carries into a fresh session.
 
 The current session is treated as disposable after this runs.
 
