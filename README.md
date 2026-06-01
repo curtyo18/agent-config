@@ -6,7 +6,7 @@ Claude Code configuration: coding standards, git hooks, slash commands, and skil
 
 - **standards/** — Code quality rules loaded by `/code-review`: naming, testing, duplication, module depth, dependency discipline, UI preferences.
 - **hooks/** — Pre-commit secret scanning (filename, regex, gitleaks).
-- **commands/** — Slash commands for code review (`code-review` plus the layered multi-agent `deep-code-review`), release checklists, cloud agent briefs, Chrome extension scaffolding, and pre-public-repo audits.
+- **commands/** — Slash commands for code review (`code-review` plus the layered multi-agent `deep-code-review`), release checklists, cloud agent briefs, Chrome extension scaffolding, pre-public-repo audits, and selective context compaction (`context-collect`).
 - **skills/** — Agent skills: `idea` (vague → grilled spec → plan), `run-plan` (subagent execution), `to-issues`, `grill-me`, `debug` (root-cause-first investigation).
 - **CLAUDE.md** — Global conventions cloned in as `~/.claude/CLAUDE.md`: scope discipline, two-strike rule, git workflow, permission hygiene.
 - **settings.json** — Claude Code settings: default model, permission allowlist + default mode, and statusline wiring.
