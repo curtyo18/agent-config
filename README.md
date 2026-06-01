@@ -31,11 +31,36 @@ Or let [agent-sandbox](https://github.com/curtyo18/agent-sandbox) do it automati
 
 ## Status line
 
-`statusline.py` renders session usage metrics in the Claude Code status bar:
+`statusline.py` renders a compact, colour-coded session readout in the Claude Code status bar:
 
 <!-- Screenshot pending. Drop the image at docs/statusline.png, then replace the line below with:
      ![agent-config status line](docs/statusline.png) -->
 > 📸 _Status-line screenshot coming soon._
+
+Left to right:
+
+- **cwd** — current directory (dimmed; `~` for home, long paths truncated) for orientation.
+- **`ctx:N% (Mk)`** — context window used: percentage of the window plus the absolute token count
+  (in thousands). Its colour tracks the **absolute tokens, not the percentage** — what degrades a
+  session ("context rot") is how many tokens are in play, not how full the window is, so `ctx:45%`
+  can already be red if that's ~80k tokens.
+- **`5hr:N% (Xh Ym)`** — Claude.ai Pro/Max 5-hour rate-limit usage and time to reset; falls back to
+  **`session:$X.XX`** (session cost) when no rate-limit data is present.
+- **`weekly:N%`** — Claude.ai Pro/Max 7-day rate-limit usage.
+
+The context colour escalates with absolute size — **red at ~75k, and bold red at ~100k, where
+context rot starts to bite** (your cue to compact, summarise, or start a fresh session):
+
+| Context tokens | Colour |
+|---|---|
+| < 25k | green |
+| 25k–50k | yellow |
+| 50k–75k | orange |
+| 75k–100k | red |
+| ≥ 100k | **bold red** (rot territory) |
+
+(The 5-hour and weekly bars use a percentage scale instead: green < 40%, then yellow, orange,
+red ≥ 75%, and bold red ≥ 90%.)
 
 ## Planning & execution skills
 
