@@ -33,9 +33,7 @@ Or let [agent-sandbox](https://github.com/curtyo18/agent-sandbox) do it automati
 
 `statusline.py` renders a compact, colour-coded session readout in the Claude Code status bar:
 
-<!-- Screenshot pending. Drop the image at docs/statusline.png, then replace the line below with:
-     ![agent-config status line](docs/statusline.png) -->
-> 📸 _Status-line screenshot coming soon._
+![agent-config status line](docs/statusline.png)
 
 Left to right:
 
