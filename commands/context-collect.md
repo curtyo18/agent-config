@@ -37,17 +37,19 @@ Wait for the user. Interpret their reply:
 - Acceptance ("go", "looks good", "yes") → use the recommended set.
 - Explicit numbers / ranges ("1, 5-7") → use exactly those.
 - Exclusions ("drop the debugging stuff") → start from recommended and remove.
+- Abort / keep nothing ("forget it", "cancel", "none") → stop here; write no file.
 - Ambiguous ("keep the important stuff") → ask one clarifying question; do not guess.
 
 ## Step 3 — Write the snapshot
 
-Ensure the directory exists, then write the kept items to a temp file.
+Ensure the directory exists and capture a real timestamp from the shell (do **not** guess the time):
 
 ```bash
 mkdir -p /tmp/context-collector
+ts=$(date +%Y%m%d-%H%M%S)
 ```
 
-Filename: `/tmp/context-collector/<YYYYMMDD-HHMMSS>-<slug>.md`, where `<slug>` is a short kebab-case title derived from the session topic. Use the real current time for the timestamp.
+Filename: `/tmp/context-collector/<ts>-<slug>.md`, where `<slug>` is the kebab-case form of the short title you pick for this snapshot (derive the title once, then slugify it — keep the two consistent). Use the exact `$ts` value for **both** the filename and the `**Captured:**` field below so they always match.
 
 Write the file in this **hybrid format** — a narrative preamble followed by structured buckets:
 
@@ -77,10 +79,14 @@ Rules:
 
 Print the full snapshot path. Then offer: *"Copy the path to your clipboard?"*
 
-If the user agrees, pipe it to the clipboard bridge:
+If the user agrees, pipe it to the clipboard bridge — but only if `clip` is available; otherwise just leave the path printed and say so:
 
 ```bash
-echo "/tmp/context-collector/<file>.md" | clip
+if command -v clip >/dev/null 2>&1; then
+  echo "/tmp/context-collector/<ts>-<slug>.md" | clip
+else
+  echo "clip not available — path printed above."
+fi
 ```
 
-Finally, remind the user: *"Start a fresh session and point it at this file (e.g. `read /tmp/context-collector/<file>.md`) to continue."*
+Finally, remind the user: *"Start a fresh session and point it at this file (e.g. `read /tmp/context-collector/<ts>-<slug>.md`) to continue."*
