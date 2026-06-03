@@ -47,7 +47,6 @@ Before writing the spec, ask where to save:
 3. If found, use them.
 4. If not found, check `.gitignore` for a suitable ignored folder (`scratch/`, `local/`, `.local/`). Use it if found.
 5. If still nothing, add `/.idea-scratch/` to `.gitignore` and use that as the base.
-- **Life repo exception:** always `wip/<slug>/specs/` and `wip/<slug>/plans/`. Derive slug from idea title; confirm with user if ambiguous.
 
 Spec → `<base>/specs/YYYY-MM-DD-<slug>-design.md`
 Plan → `<base>/plans/YYYY-MM-DD-<slug>-implementation.md`
