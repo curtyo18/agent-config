@@ -29,6 +29,7 @@ WXT provides Chrome API types out of the box. For a non-WXT setup, depend on `ch
 ## manifest / icons conventions
 
 - Set extension-wide fields (`name`, `permissions`, `action`, icons) in `wxt.config.ts` under `manifest`. WXT auto-wires `action.default_icon` and top-level `icons` from the generated icon set.
+- **Single-source the version from `package.json`.** WXT stamps it into the generated `manifest.json` at build, so `npm version` is the only bump. Never hardcode a version literal in a manifest. If you deviate to a hand-rolled / crxjs / vite-plugin manifest, read the version from `package.json` at build time (don't duplicate it) — otherwise `npm version` updates one and the manifest ships stale.
 - `run_at: "document_idle"` for content scripts (the default).
 - Design icons as an SVG at `assets/icon.svg`. Render to 16/48/128 PNGs with `@resvg/resvg-js` (pure JS, no native compile — works on Windows) into `public/icons/` so WXT copies them into the build. Commit the generated PNGs so collaborators don't need to run the icon step.
 
@@ -80,6 +81,7 @@ node_modules/
 - Concise code — don't add comments, docstrings, or error handling for impossible scenarios
 - Don't over-engineer — build exactly what's needed, no speculative abstractions
 - Rebuild and verify after every change — always run `npm run build` and confirm it's clean before finishing
+- The loaded/zipped extension is a build artifact (`.output/`), not the source. After any change — especially a version bump — rebuild and reload *that* directory in Chrome; never hand-edit the generated `manifest.json` (it's regenerated and your edit, including the version, is lost). A stale artifact loaded unpacked is the usual reason "I bumped the version but Chrome still shows the old one."
 
 ---
 
