@@ -47,6 +47,14 @@ WXT provides Chrome API types out of the box. For a non-WXT setup, depend on `ch
 - `npm run build` — production build to `.output/`
 - `npm run zip` — produces a versioned zip (version pulled from `package.json`) ready for Chrome Web Store upload
 
+## Release automation
+
+Don't cut releases by hand — a manual `gh release create` is exactly where the built artifact gets forgotten (the release ends up with only GitHub's auto "Source code" archives). Scaffold `.github/workflows/release.yml` that fires on a `v*` tag push and builds → zips → publishes the GitHub release with the zip attached. The release ritual is then just bump → tag → push; the artifact attaches itself.
+
+- Trigger on `push: { tags: ['v*'] }`; set `permissions: contents: write`; drive it with the `gh` CLI (`gh release create "$tag" *.zip --generate-notes`) — no extra marketplace actions.
+- Fail the job if the tag (`vX`) doesn't equal `package.json`'s version — catches a tag pushed without a bump.
+- For a non-WXT / hand-rolled build, also verify the built manifest's version equals `package.json` before publishing, so a stale `.output/`/`dist/` can't ship the wrong version.
+
 ## Storage
 
 - `chrome.storage.sync` — user configuration/watchlists. Persists across sessions, syncs across devices.
