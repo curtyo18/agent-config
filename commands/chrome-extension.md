@@ -8,7 +8,7 @@ You are helping me build a Chrome Extension (Manifest V3) using TypeScript. Mani
 
 - **Framework / build tool**: [WXT](https://wxt.dev) (`npx wxt@latest init`). It is Vite-based, generates `manifest.json` from the files in `entrypoints/`, handles cross-browser (Chrome/Firefox/Edge) differences, and ships typed APIs — so there is no hand-written manifest or bundler config to maintain. WXT supersedes the older `vite-plugin-web-extension`/CRXJS approaches.
 - **Entry points**: Define each surface as a file in `entrypoints/` exporting `defineBackground`, `defineContentScript`, or an HTML page (e.g. `popup/`). Don't edit a manifest by hand; configure extension-wide fields in `wxt.config.ts`.
-- **Popup UI**: Preact (not React — too heavy for an extension). Use JSX with `"jsxImportSource": "preact"` in tsconfig, or WXT's `@wxt-dev/module-preact`.
+- **Popup UI**: Preact (not React — too heavy for an extension). Use JSX with `"jsxImportSource": "preact"` in tsconfig (esbuild handles it), or add `@preact/preset-vite` via the `wxt.config.ts` `vite()` hook for Fast Refresh. There is **no** official WXT Preact module — only react/vue/svelte/solid exist; do not reference `@wxt-dev/module-preact`.
 - **Content script UI**: Vanilla TypeScript DOM manipulation only. Never use a framework in a content script — it risks conflicts with the host page's own framework.
 - **Content script isolation**: Always inject UI into a Shadow DOM (WXT's `createShadowRootUi` helper) so styles are fully isolated from the host page.
 - **Styling**: CSS imported as `?inline` into the content script and injected into the Shadow DOM as a `<style>` element.
