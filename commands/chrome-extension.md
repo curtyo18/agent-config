@@ -45,7 +45,7 @@ WXT provides Chrome API types out of the box. For a non-WXT setup, depend on `ch
 - `npm run icons` — generate icon PNGs from the SVG source
 - `npm run dev` — dev server with HMR and auto-reload
 - `npm run build` — production build to `.output/`
-- `npm run zip` — produces a versioned zip (version pulled from `package.json`) ready for Chrome Web Store upload
+- `npm run zip` — produces the flat, versioned zip (`manifest.json` at the archive root, version pulled from `package.json`) ready for Chrome Web Store upload. WXT cannot nest this output in a subfolder; a repo-named, folder-wrapped variant for unpacked installs is produced in CI (see Release automation).
 
 ## Release automation
 
@@ -54,6 +54,14 @@ Don't cut releases by hand — a manual `gh release create` is exactly where the
 - Trigger on `push: { tags: ['v*'] }`; set `permissions: contents: write`; drive it with the `gh` CLI (`gh release create "$tag" *.zip --generate-notes`) — no extra marketplace actions.
 - Fail the job if the tag (`vX`) doesn't equal `package.json`'s version — catches a tag pushed without a bump.
 - For a non-WXT / hand-rolled build, also verify the built manifest's version equals `package.json` before publishing, so a stale `.output/`/`dist/` can't ship the wrong version.
+- **Publish two artifacts: the flat `wxt zip` output (Web Store format) AND a repo-named, folder-wrapped zip for unpacked installs.** `wxt zip` archives the build with `manifest.json` at the root (what the Web Store requires) and has no option to nest it in a subfolder — so add a post-build step that copies `.output/chrome-mv3` into a folder named after the repo and zips that, so users can download → extract → "Load unpacked" the resulting `<repo>/` directory:
+  ```bash
+  name="${GITHUB_REPOSITORY##*/}"; ver="$(node -p "require('./package.json').version")"
+  mkdir -p .output/pack && rm -rf ".output/pack/$name"
+  cp -r .output/chrome-mv3 ".output/pack/$name"
+  ( cd .output/pack && zip -r "$GITHUB_WORKSPACE/${name}-${ver}.zip" "$name" )   # zip is preinstalled on ubuntu-latest
+  ```
+  then attach both (idempotently, so re-runs `--clobber`): `gh release create "$tag" "${name}-${ver}.zip" .output/*-chrome.zip --generate-notes`. Stage under `.output/pack/` so the existing `.output/` + `*.zip` gitignore entries already cover it.
 
 ## Storage
 
@@ -70,7 +78,7 @@ Before submitting, you need:
 2. **Screenshot** — create `docs/screenshot-mock.html`, a self-contained file rendering a realistic 1280x800 mockup of the extension UI over a fake host page. Open it in Chrome and screenshot it.
 3. **Privacy policy** — create `docs/privacy.html` with a plain-English policy covering what data the extension stores and what network requests it makes. Host it anywhere with a stable public URL (any static host works).
 4. **Permissions justification** — write clear justifications for any broad permissions explaining why narrowing them isn't possible.
-5. **Package** — `npm run zip` produces the versioned zip.
+5. **Package** — `npm run zip` produces the flat versioned zip for the Web Store; the release workflow additionally publishes a repo-named, folder-wrapped zip for unpacked installs (see Release automation).
 
 ## .gitignore
 
