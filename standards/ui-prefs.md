@@ -14,7 +14,7 @@ Directive frontend standards. Read this before starting any UI work. Stack picks
 
 - **Genuine SPA** — When building a rich client-side app with deep state and complex routing, use **Vite 8 + React 19 + TanStack Router + TanStack Query + Zustand for client state + shadcn/ui**. *Deviate when:* bundle size and reactivity performance matter more than React ecosystem depth, and you want to break the React reflex — use **SvelteKit 2 with Svelte 5 runes**.
 
-- **Chrome / browser extension** — When building a Manifest V3 extension, use **WXT with React and Tailwind v4**. WXT (Vite-based, actively shipping in 2026) generates the MV3 manifest, builds cross-browser bundles, and gives HMR for popup and content scripts. *Deviate when:* the extension is a pure content-script DOM tweaker with no popup — drop to a **Vite vanilla-TS** template with a hand-written manifest.
+- **Chrome / browser extension** — The extension stack is owned by `commands/chrome-extension.md` — defer to it rather than duplicating (or contradicting) the decision here. (It mandates **WXT with Preact, no Tailwind**, matching the real extensions.)
 
 ## Dark mode — always dark
 

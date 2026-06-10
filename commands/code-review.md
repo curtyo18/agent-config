@@ -27,7 +27,7 @@ If either resolution fails, report which ref didn't resolve and stop.
 
 ## Step 2 — Detect rule files
 
-Locate the `standards/` folder. Prefer the repo-relative path `standards/`; fall back to `~/code/agent-config/standards/` if the current repo doesn't have its own copy.
+Locate the `standards/` folder. Prefer the repo-relative path `standards/`; fall back to `~/.claude/standards/` (the documented install location) if the current repo doesn't have its own copy.
 
 If neither path contains the six expected files (`coding-standards.md`, `test-patterns.md`, `code-duplication.md`, `deep-modules.md`, `dependency-discipline.md`, `ui-prefs.md`), tell the user:
 
