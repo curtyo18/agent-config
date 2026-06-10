@@ -60,8 +60,10 @@ patterns=(
   'aws_secret_access_key\s*=\s*[A-Za-z0-9/+]{40}'
 )
 # Scan added lines only — exclude removed/context lines and the +++ file header — so editing a
-# secret *out* of a kept file is not blocked (that's the remediation, not the leak).
-added_lines=$(git diff --cached --no-color | grep '^+' | grep -v '^+++')
+# secret *out* of a kept file is not blocked (that's the remediation, not the leak). The header
+# exclusion anchors on the trailing space ('+++ b/path') so an added *content* line that happens
+# to start with '++' (which appears as '+++...' in the diff) is still scanned, not dropped.
+added_lines=$(git diff --cached --no-color | grep '^+' | grep -v '^+++ ')
 for p in "${patterns[@]}"; do
   if echo "$added_lines" | grep -E -q -- "$p"; then
     log_hit "regex" "$p"
