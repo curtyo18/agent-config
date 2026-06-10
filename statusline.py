@@ -6,7 +6,7 @@ import json
 import time
 
 def color_for_pct(pct):
-    """Green < 40, yellow ~50, orange ~70, red >= 85."""
+    """Green < 40, yellow < 55, orange < 75, red < 90, bold red >= 90."""
     if pct < 40:
         return "\033[32m"   # green
     elif pct < 55:
@@ -58,7 +58,7 @@ except Exception:
 
 # Context window
 ctx = data.get("context_window", {})
-ctx_pct = ctx.get("used_percentage", 0)
+ctx_pct = ctx.get("used_percentage") or 0
 ctx_pct_int = int(ctx_pct)
 ctx_tokens = ctx.get("total_input_tokens") or 0
 
