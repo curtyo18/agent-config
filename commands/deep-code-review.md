@@ -8,9 +8,9 @@ You are running a **deep, layered code review**. This is the thorough-audit tier
 
 `code-review.md` is the single source of truth for the **rubric**: it locates and loads the six `standards/*.md` rule files, defines the reviewer prompt, the Strengths / Issues (Critical / Important / Minor) / Assessment output shape, and the severity vocabulary. This skill **reuses all of that by reference** and adds only the orchestration layer (domain split → parallel review → cross-verification → adjudication → optional fix tail).
 
-- Do **not** re-list or re-describe the six standards files here — point reviewers at the same `standards/` folder `code-review.md` uses (repo-relative `standards/`, else the agent-config checkout).
+- Do **not** re-list or re-describe the six standards files here — point reviewers at the same `standards/` folder `code-review.md` uses (repo-relative `standards/`, else `~/.claude/standards/`).
 - Do **not** invent a new severity scale — use the labels the rule files declare, exactly as `/code-review` does.
-- The per-reviewer output format below is intentionally identical to `/code-review`'s so the two are interchangeable at the leaf level.
+- The per-reviewer Strengths / Issues (Critical / Important / Minor) shape below is shared with `/code-review` so the two are interchangeable at the leaf level. The **Assessment** block deliberately differs: here it is area-scoped (the area's health), whereas `/code-review`'s is a single merge verdict — that difference is intended, don't force them identical.
 
 ## Step 1 — Scope the review
 

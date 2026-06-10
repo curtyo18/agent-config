@@ -20,6 +20,8 @@ Clone into `~/.claude`:
 
 ```bash
 git clone https://github.com/curtyo18/agent-config.git ~/.claude
+# Wire the pre-commit secret scan (the sandbox does this for you; standalone clones must opt in):
+git config --global core.hooksPath ~/.claude/hooks
 ```
 
 Or let [agent-sandbox](https://github.com/curtyo18/agent-sandbox) do it automatically on container start.

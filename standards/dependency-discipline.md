@@ -1,6 +1,6 @@
 # Dependency discipline
 
-New dependencies are a permanent liability: supply-chain surface, version drift, transitive footprint, and a thing the next reader has to learn. This rule applies to every stack. It only triggers when the diff *changes the manifest* — `package.json`, `requirements.txt`, `go.mod`, `Cargo.toml`, `pyproject.toml`, or equivalent.
+New dependencies are a permanent liability: supply-chain surface, version drift, transitive footprint, and a thing the next reader has to learn. This rule applies to every stack. It triggers primarily when the diff *changes the manifest* — `package.json`, `requirements.txt`, `go.mod`, `Cargo.toml`, `pyproject.toml`, or equivalent — plus the hand-rolled-utility case below (in-house reimplementation of a stdlib helper), which involves no manifest change.
 
 ## What to flag
 
