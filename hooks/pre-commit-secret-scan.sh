@@ -7,21 +7,35 @@ AUDIT_LOG="${CLAUDE_AUDIT_LOG:-/audit/$(date -u +%F).jsonl}"
 TS="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 CWD="$(pwd)"
 
+# JSON-escape a string for safe interpolation into a JSONL field (backslash first, then quote).
+json_escape() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  printf '%s' "$s"
+}
+
 log_hit() {
   mkdir -p "$(dirname "$AUDIT_LOG")" 2>/dev/null || true
   printf '{"ts":"%s","src":"pre-commit","action":"secret-scan-hit","cwd":"%s","layer":"%s","detail":"%s"}\n' \
-    "$TS" "$CWD" "$1" "$2" >> "$AUDIT_LOG"
+    "$(json_escape "$TS")" "$(json_escape "$CWD")" "$(json_escape "$1")" "$(json_escape "$2")" >> "$AUDIT_LOG"
 }
 
 # Override path: skip everything if CLAUDE_ALLOW_SECRET_COMMIT=1 (logged as override-used).
+# Fail closed — the override is only honoured if the audit record is actually written. An
+# unwritable audit log must refuse the override rather than allow an untracked bypass.
 if [[ "${CLAUDE_ALLOW_SECRET_COMMIT:-0}" == "1" ]]; then
-  mkdir -p "$(dirname "$AUDIT_LOG")"
-  printf '{"ts":"%s","src":"pre-commit","action":"secret-scan-override","cwd":"%s","blocked":false}\n' \
-    "$TS" "$CWD" >> "$AUDIT_LOG"
+  if ! mkdir -p "$(dirname "$AUDIT_LOG")" 2>/dev/null || \
+     ! printf '{"ts":"%s","src":"pre-commit","action":"secret-scan-override","cwd":"%s","blocked":false}\n' \
+       "$(json_escape "$TS")" "$(json_escape "$CWD")" >> "$AUDIT_LOG" 2>/dev/null; then
+    echo "REFUSED (override): CLAUDE_ALLOW_SECRET_COMMIT=1 set but audit log '$AUDIT_LOG' is unwritable." >&2
+    echo "  An override that cannot be recorded is not allowed. Fix CLAUDE_AUDIT_LOG and retry." >&2
+    exit 1
+  fi
   exit 0
 fi
 
-staged=$(git diff --cached --name-only --diff-filter=ACM)
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
 [[ -z "$staged" ]] && exit 0
 
 # === Layer 1: filename filter ===
@@ -45,13 +59,17 @@ patterns=(
   '-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----'
   'aws_secret_access_key\s*=\s*[A-Za-z0-9/+]{40}'
 )
-diff_content=$(git diff --cached --no-color)
+# Scan added lines only — exclude removed/context lines and the +++ file header — so editing a
+# secret *out* of a kept file is not blocked (that's the remediation, not the leak).
+added_lines=$(git diff --cached --no-color | grep '^+' | grep -v '^+++')
 for p in "${patterns[@]}"; do
-  if echo "$diff_content" | grep -E -- "$p" >/tmp/pat-hit; then
-    hit=$(head -1 /tmp/pat-hit | head -c 80)
+  if echo "$added_lines" | grep -E -q -- "$p"; then
     log_hit "regex" "$p"
-    echo "BLOCKED (regex): pattern '$p' matched staged diff." >&2
-    echo "  Matched line (truncated): $hit" >&2
+    # Do not print the matched line — it would leak the secret to stderr/transcript. Report the
+    # pattern and the staged file list instead.
+    echo "BLOCKED (regex): pattern '$p' matched an added line in the staged diff." >&2
+    echo "  Staged files: $(echo "$staged" | tr '\n' ' ')" >&2
+    echo "  (Matched text withheld to avoid leaking the secret into the transcript.)" >&2
     echo "  Override: CLAUDE_ALLOW_SECRET_COMMIT=1 git commit ..." >&2
     exit 51
   fi
