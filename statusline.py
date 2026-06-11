@@ -19,14 +19,14 @@ def color_for_pct(pct):
         return "\033[1;31m" # bold red
 
 def color_for_ctx_tokens(tokens):
-    """Color shift based on absolute context size; ~100k is the rot threshold."""
+    """Color shift based on absolute context size; ~120k is the rot threshold."""
     if tokens < 25000:
         return "\033[32m"        # green
     elif tokens < 50000:
         return "\033[33m"        # yellow
     elif tokens < 75000:
         return "\033[38;5;208m"  # orange
-    elif tokens < 100000:
+    elif tokens < 120000:
         return "\033[31m"        # red
     else:
         return "\033[1;31m"      # bold red — in rot territory
