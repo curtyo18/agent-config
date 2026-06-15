@@ -1,12 +1,22 @@
 ---
-description: Selective alternative to /compact. Scans the live context, buckets it, recommends a keep-set you can accept or override, then writes a curated snapshot to /tmp/context-collector/<timestamp>-<slug>.md for resuming in a fresh session. Temp-file only; does not evict tokens from the current session.
+description: Selective alternative to /compact. Asks what you're picking up next, scans the live context and buckets it against that intent, recommends a keep-set you can accept or override, then writes a curated snapshot to /tmp/context-collector/<timestamp>-<slug>.md for resuming in a fresh session. Temp-file only; does not evict tokens from the current session.
 ---
 
 You are running **Context Collector** — a selective, interactive alternative to `/compact`. Unlike `/compact`, you do **not** evict tokens from this session. You produce a curated **context snapshot** the user carries into a fresh session.
 
 The current session is treated as disposable after this runs.
 
-Work through the four steps below in order. Do not skip the user confirmation in Step 2.
+Work through the steps below in order. Do not skip either user interaction — the intent question in Step 0 (unless it's already answered) or the keep-set confirmation in Step 2.
+
+## Step 0 — Establish forward intent
+
+The keep-set is only as good as your read on *where the user is headed next*. Establish that before scanning, so it can steer what counts as worth keeping.
+
+- If the user already stated their next move — in how they invoked this command, or in the last few turns ("snapshot this before I move on to the parser rewrite") — take that as the intent and don't re-ask.
+- Otherwise ask one question and wait: **"What are you picking up in the fresh session? (e.g. 'continuing the auth refactor', 'starting fresh on the export bug')"**
+- If the user genuinely doesn't know yet, accept it — fall back to *recency + open loops* as the heuristic (most-recent work and unresolved tasks win) and say that's what you're doing.
+
+Hold the stated intent as the **relevance lens** for Steps 1–2: context that serves the next task is keep-worthy; threads the user is done with (a shipped feature, an abandoned approach) drop out even if they loomed large in the session. Don't discard them silently — they just don't make the recommended set, and the user can still pull any item back by number in Step 2.
 
 ## Step 1 — Scan the live context
 
@@ -29,7 +39,7 @@ Print all detected items as a **numbered markdown list grouped by bucket**. Numb
 
 After the list, add a final line:
 
-`**Recommended keep:** 1, 2, 5, 7` (the numbers you'd keep — your own best assessment of what matters).
+`**Recommended keep:** 1, 2, 5, 7` (the numbers you'd keep — driven by the forward intent from Step 0: what serves the next task stays, what belongs to finished or abandoned threads drops).
 
 Then ask: *"Accept the recommended set, or give me the numbers to keep (e.g. 'keep 1, 5, 6, 7')?"*
 
@@ -63,7 +73,7 @@ Write the file in this **hybrid format** — a narrative preamble followed by st
 **Captured:** <timestamp>  ·  **Source slug:** <slug>
 
 ## Situation
-<2–3 sentence narrative: where we are, what we're doing, what's next>
+<2–3 sentence narrative: where we are, what we're doing, and what's next — lead the "what's next" with the forward intent from Step 0 so the resumed session orients to it first>
 
 <then ONE section per kept bucket, in the standard order above, using the standard
 bucket headings. OMIT any bucket with no kept items. Render Open tasks as
