@@ -15,7 +15,7 @@ If your first fix doesn't fully work, try one more focused attempt. If that does
 - Propose 2–3 fundamentally different approaches (not variations of the failing one).
 - Wait for direction before continuing.
 
-This rule exists because patching a flawed model with offset hacks always loses to stepping back and rethinking the underlying coordinate system / data flow / abstraction.
+This rule exists because patching a flawed mental model with local fixes always loses to stepping back and rethinking the underlying structure, data flow, or abstraction.
 
 ## Git workflow defaults
 
