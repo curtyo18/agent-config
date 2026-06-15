@@ -48,7 +48,7 @@ Left to right:
   **`session:$X.XX`** (session cost) when no rate-limit data is present.
 - **`weekly:N%`** — Claude.ai Pro/Max 7-day rate-limit usage.
 
-The context colour escalates with absolute size — **red at ~75k, and bold red at ~100k, where
+The context colour escalates with absolute size — **red at ~75k, and bold red at ~120k, where
 context rot starts to bite** (your cue to compact, summarise, or start a fresh session):
 
 | Context tokens | Colour |
@@ -56,8 +56,8 @@ context rot starts to bite** (your cue to compact, summarise, or start a fresh s
 | < 25k | green |
 | 25k–50k | yellow |
 | 50k–75k | orange |
-| 75k–100k | red |
-| ≥ 100k | **bold red** (rot territory) |
+| 75k–120k | red |
+| ≥ 120k | **bold red** (rot territory) |
 
 (The 5-hour and weekly bars use a percentage scale instead: green < 40%, then yellow, orange,
 red ≥ 75%, and bold red ≥ 90%.)
