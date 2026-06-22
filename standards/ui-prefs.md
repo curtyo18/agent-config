@@ -10,7 +10,7 @@ Directive frontend standards. Read this before starting any UI work. Stack picks
 
 - **Small browser-side tool** — When building a single-purpose utility (regex tester, converter, scratchpad) with no backend, use **Vite 8 with vanilla TypeScript and Tailwind v4**. The `vanilla-ts` template scaffolds in one command; zero framework overhead. *Deviate when:* the tool grows past ~3 components with shared state — graduate to **Astro with a single React or Svelte island**, not a full SPA.
 
-- **Internal tool / dashboard** — When building a forms-and-tables CRUD admin against an API, use **Vite 8 + React 19 + TanStack Router + TanStack Query + TanStack Table + shadcn/ui (Base UI primitives)**. Type-safe routing, search-param state, cache/refetch, and copy-into-repo components. *Deviate when:* you need server functions and SSR in the same project — use **TanStack Start**.
+- **Internal tool / dashboard** — When building a forms-and-tables CRUD admin against an API, use **Vite 8 + React 19 + TanStack Router + TanStack Query + TanStack Table + shadcn/ui (Base UI primitives)**. Type-safe routing, search-param state, cache/refetch, and copy-into-repo components. *Deviate when:* you need server functions and SSR in the same project — use **TanStack Start** (still officially Release Candidate in mid-2026: API-stable and fine for personal projects, but not battle-tested — for content/SSR prefer Astro).
 
 - **Genuine SPA** — When building a rich client-side app with deep state and complex routing, use **Vite 8 + React 19 + TanStack Router + TanStack Query + Zustand for client state + shadcn/ui**. *Deviate when:* bundle size and reactivity performance matter more than React ecosystem depth, and you want to break the React reflex — use **SvelteKit 2 with Svelte 5 runes**.
 
@@ -45,6 +45,8 @@ With Tailwind v4: skip `dark:` variants entirely. Configure the palette via `@th
 **Trigger:** the build needs **three or more accessible interactive widgets** — dialog, combobox, menu, popover, tooltip, date picker, drawer — where keyboard navigation, focus management, and ARIA wiring are non-trivial. Below that bar, hand-rolled HTML + the native `<dialog>` element + Alpine for focus management is faster and lighter.
 
 **Default pick when the trigger fires:** **shadcn/ui initialized with Base UI primitives** (`npx shadcn create` and pick Base UI). Base UI 1.0 (released Feb 2026 by the MUI team) ships components Radix lacks (Combobox, Drawer, OTPField), is actively maintained, and shadcn copies source into the repo so the components are owned, dark-themed, and Tailwind-configured in place. **Configure the generated components for dark only** — strip any theme-switcher boilerplate the CLI generates.
+
+*Trade-off:* Base UI's pre-built block/template ecosystem is younger and thinner than Radix's. When a build leans on pasting whole pre-made sections (hero, pricing, dashboards) rather than composing primitives, initialise shadcn on **Radix** instead — still actively maintained (WorkOS), with the larger block library.
 
 **Skip when:** the project needs at most one or two interactive elements — hand-roll with the native `<dialog>` element or Alpine + ARIA attributes.
 
@@ -82,22 +84,13 @@ If a screen-reader user, a keyboard-only user, or the next agent reading the JSX
 
 ## Sources
 
-- https://astro.build/blog/astro-6/ — Astro 6 release (March 2026): live content collections, CSP, dev-server refactor. Basis for static-site and sprinkled-interactivity picks.
-- https://astro.build/blog/astro-630/ — Astro 6.3 (May 2026). Confirms current stable line and active maintenance.
-- https://2025.stateofjs.com/en-US/libraries/meta-frameworks/ — Astro tops meta-framework satisfaction with a 39-point gap over Next.js. Basis for the Astro picks and the Next.js avoid item.
-- https://2025.stateofjs.com/en-US/libraries/build-tools/ — Vite vs Webpack satisfaction gap. Basis for Vite-everywhere picks and the Webpack avoid item.
-- https://2025.stateofjs.com/en-US/libraries/front-end-frameworks/ — Svelte 5 runes top DX, Alpine and htmx as legitimate sprinkled-interactivity choices.
-- https://react.dev/blog/2025/02/14/sunsetting-create-react-app — Official CRA deprecation announcement. Basis for the CRA avoid item.
-- https://tailwindcss.com/docs/dark-mode — Tailwind v4 dark-mode mechanics. (We opt out of `dark:` variants and use dark-only tokens instead.)
-- https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme — `color-scheme` semantics; informs the FOUC-free dark approach in the dark-mode section.
-- https://wxt.dev/ — WXT homepage: MV3, cross-browser, Vite-based. Basis for the browser-extension pick.
-- https://github.com/wxt-dev/wxt/releases — WXT v0.20.26 (May 2026); verifies active maintenance.
-- https://htmx.org/ — htmx 2.x current stable. Basis for the htmx deviate trigger.
-- https://alpinejs.dev/ — Alpine 3 primary docs. Basis for the in-page-reactivity pick.
-- https://base-ui.com/react/overview/releases — Base UI 1.0 (Feb 2026), Drawer stable, OTPField. Basis for the component-library default pick.
-- https://github.com/mui/base-ui — Base UI repo, MUI-backed; verifies maintenance.
-- https://ui.shadcn.com/docs/changelog — shadcn/ui `npx shadcn create --base-ui` and CLI v4 changes. Confirms current shadcn workflow.
-- https://tanstack.com/start/latest — TanStack Start (Vite + Router + server functions). Informs the dashboard deviate option.
-- https://github.com/TanStack/router/releases — TanStack Router May 2026 release; verifies active maintenance.
-- https://vite.dev/guide/migration — Vite 8 migration guide; confirms Vite 8 as the current major.
-- https://www.11ty.dev/docs/versions/ — Eleventy stable v3.1.5; basis for the static-site deviate option.
+Verified mid-2026. One URL + tag each; justification lives inline with the picks above.
+
+- Astro 6 / 6.3 — https://astro.build/blog/astro-6/ , https://astro.build/blog/astro-630/
+- State of JS 2025 (Astro +39 vs Next; Vite ≫ Webpack; Svelte 5 runes, Alpine/htmx) — https://2025.stateofjs.com/en-US/libraries/
+- CRA deprecation — https://react.dev/blog/2025/02/14/sunsetting-create-react-app
+- Tailwind v4 dark mode — https://tailwindcss.com/docs/dark-mode ; `color-scheme` — https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme
+- WXT (extension pick) — https://wxt.dev/releases ; htmx 2 — https://htmx.org/ ; Alpine 3 — https://alpinejs.dev/
+- Base UI 1.0 (`@base-ui/react`, MUI-maintained) — https://github.com/mui/base-ui/releases ; shadcn Base UI init — https://ui.shadcn.com/docs/changelog ; Radix still maintained (WorkOS) — https://github.com/radix-ui/primitives
+- TanStack Router 1.170 (active) / Start still RC — https://github.com/TanStack/router/releases , https://tanstack.com/start/latest
+- Vite 8 — https://vite.dev/guide/migration ; Eleventy 3 — https://www.11ty.dev/docs/versions/
