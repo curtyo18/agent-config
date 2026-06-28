@@ -1,3 +1,7 @@
+## Concision
+
+Be extremely concise. Sacrifice grammar for concision. Drop filler, preamble, and restating the question — answer first.
+
 ## Scope discipline
 
 Stay inside the boundary of what was asked.
