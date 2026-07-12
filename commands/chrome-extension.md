@@ -75,10 +75,42 @@ Don't cut releases by hand — a manual `gh release create` is exactly where the
 Before submitting, you need:
 
 1. **Icons** — `npm run icons` generates them.
-2. **Screenshot** — create `docs/screenshot-mock.html`, a self-contained file rendering a realistic 1280x800 mockup of the extension UI over a fake host page. Open it in Chrome and screenshot it.
-3. **Privacy policy** — create `docs/privacy.html` with a plain-English policy covering what data the extension stores and what network requests it makes. Host it anywhere with a stable public URL (any static host works).
+2. **Screenshot** — create `docs/screenshot-mock.html`, a self-contained file rendering a realistic 1280x800 mockup of the extension UI over a fake host page. Open it in Chrome and screenshot it. Save shots to `docs/store/screenshots/` (1280×800 or 640×400 PNGs).
+3. **Privacy policy** — create `docs/privacy.html` with a plain-English policy covering what data the extension stores and what network requests it makes. Host it anywhere with a stable public URL (GitHub Pages from `main` / `/docs` is the default — the privacy page is then `https://<user>.github.io/<repo>/privacy.html`).
 4. **Permissions justification** — write clear justifications for any broad permissions explaining why narrowing them isn't possible.
 5. **Package** — `npm run zip` produces the flat versioned zip for the Web Store; the release workflow additionally publishes a repo-named, folder-wrapped zip for unpacked installs (see Release automation).
+6. **Listing pack** — write `docs/store/listing.md` as the copy-paste source for the dashboard, ordered to match the dashboard form (see template below).
+
+## Store listing pack (`docs/store/listing.md`)
+
+Write this as a fill-in-order mirror of the CWS Developer Dashboard so submission is copy-paste, not a scavenger hunt. Structure it as the dashboard's two tabs. Keep the exact field names — they map 1:1 to the form.
+
+**Store listing tab** — in this order:
+
+- **Item name / title** (max 75 chars)
+- **Summary** (short description, max 132 chars — usually the manifest `description`)
+- **Description** (max 16,000 chars — the long marketing copy)
+- **Category**
+- **Language** (match the dashboard default, e.g. en-GB / en-US)
+- **Store icon** (128×128 — point at `public/icons/128.png`)
+- **Screenshots** (≥1; list each file in `docs/store/screenshots/` with a one-line caption)
+- **Homepage URL** (the repo or product site)
+- **Support URL** (default to `https://github.com/<user>/<repo>/issues`)
+
+**Privacy tab** — in this order:
+
+- **Single purpose description** (one paragraph: the *one* thing the extension does)
+- **Permission justifications** — one field per entry in `permissions` **and** each `host_permissions` grant; explain why each is needed and why it can't be narrowed. Broad host access (`<all_urls>`) always needs the most care.
+- **Are you using remote code?** — **No** for a compliant MV3 build (all JS bundled, no `eval`, no `<script src>` to a CDN). If Yes, a justification field is required.
+- **Data usage** — the consequential part:
+  - Answer each of Google's **nine** categories Yes/No with a one-line rationale: *Personally identifiable information · Health information · Financial and payment information · Authentication information · Personal communications · Location · Web history · User activity · Website content*. A table (`Category | Collected? | Rationale`) reads cleanly.
+  - Certify the **three** Limited-Use statements (all normally true): (1) don't sell/transfer to third parties outside approved use cases, (2) don't use/transfer for purposes unrelated to the single purpose, (3) don't use for creditworthiness/lending.
+  - **Privacy policy URL** (the hosted `privacy.html`).
+- **Notes for reviewers** — lead with the facts that de-risk review (no `debugger`, no remote code, read-only vs. blocking, where sensitive data lives and that it never leaves the device).
+
+> **Data-usage judgment call — surface it, don't bury it.** Google defines "collect" as *transmitting data off the device*. An extension that transmits nothing can honestly answer **"does not collect."** But if it *reads* sensitive data locally (auth headers, page content, URLs), declaring those categories + certifying Limited Use is the more defensible stance under review. This is a real decision with public-listing consequences — call it out at the top of `listing.md` and let the user choose, rather than silently picking one.
+
+End the pack with a **submission checklist** (icon ✓, ≥1 screenshot ✓, privacy policy live, both tabs filled, data-usage decision confirmed, upload the *current-version* zip only).
 
 ## .gitignore
 
