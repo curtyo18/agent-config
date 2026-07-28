@@ -20,7 +20,7 @@ Execute an implementation plan. If mode is not specified, ask at the start:
    - Dispatch spec compliance reviewer → loop until passes.
    - Dispatch code quality reviewer → loop until passes.
    - Mark task complete. Move to next.
-3. After all tasks complete: dispatch a final full-codebase code reviewer.
+3. After all tasks complete: invoke the `code-review` skill (BASE = the commit before the first task, HEAD = current) to audit the full change against `standards/*.md`. Surface its report; do not implement fixes without user direction.
 4. Never dispatch multiple implementer subagents in parallel.
 5. Never start on `main`/`master` without explicit user consent.
 
@@ -29,7 +29,8 @@ Execute an implementation plan. If mode is not specified, ask at the start:
 1. Load the plan. Raise any concerns before starting.
 2. Execute each task one at a time: follow steps exactly → run each verification → mark complete.
 3. Stop immediately when blocked, a test fails, or an instruction is unclear. Ask; never guess.
-4. Recommend Mode 1 if the environment supports subagents.
+4. After all tasks complete: invoke the `code-review` skill (BASE = the commit before the first task, HEAD = current) to audit the full change against `standards/*.md`.
+5. Recommend Mode 1 if the environment supports subagents.
 
 ## Model Selection
 
